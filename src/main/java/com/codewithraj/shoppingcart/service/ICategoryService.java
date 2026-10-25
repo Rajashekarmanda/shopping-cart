@@ -12,7 +12,9 @@ public interface ICategoryService {
 
     Category getCategoryByName(String name);
 
-//    Category addCategory(Category category);
-//    Category updateCategory(Category category, Long id);
-//    void deleteCategory(Long id);
+    Category addCategory(Category category);
+
+    Category updateCategory(Category category, Long id);
+
+    void deleteCategory(Long id);
 }

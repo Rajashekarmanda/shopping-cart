@@ -6,10 +6,7 @@ import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
 import com.codewithraj.shoppingcart.service.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +34,43 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<ApiResponse> getCategoryByName(@PathVariable String name) {
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> getCategoryByName(@RequestParam String name) {
         try {
             Category category = categoryService.getCategoryByName(name);
             return ResponseEntity.ok(new ApiResponse("Found Category",category));
         }catch (ResourceNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse> addCategory(@RequestBody Category category) {
+        Category newCategory = categoryService.addCategory(category);
+        if (newCategory != null) {
+            return ResponseEntity.ok(new ApiResponse("Added Category",newCategory));
+        }else  {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateCategory(@RequestBody Category category, @PathVariable Long id) {
+        Category newCategory = categoryService.updateCategory(category, id);
+        if (newCategory != null) {
+            return ResponseEntity.ok(new ApiResponse("Updated Category",newCategory));
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse> deleteCategory(@RequestBody Category category) {
+        Optional<Category> categoryToDelete = categoryService.getCategoryById(category.getId());
+        if (categoryToDelete.isPresent()) {
+            categoryService.deleteCategory(categoryToDelete.get().getId());
+            return ResponseEntity.ok(new ApiResponse("Deleted Category",category));
+        }else {
             return ResponseEntity.notFound().build();
         }
     }

@@ -2,7 +2,9 @@ package com.codewithraj.shoppingcart.service;
 
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.repository.CategoryRepository;
+import com.codewithraj.shoppingcart.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,9 +16,9 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public List<Category> getAllCategories() {
+    public ResponseEntity<ApiResponse> getAllCategories() {
         List<Category> categories = new ArrayList<>();
         categories =categoryRepository.findAll();
-        return categories.size() > 0 ? categories : null;
+        return ResponseEntity.ok(new ApiResponse("Category List", categories));
     }
 }

@@ -1,7 +1,7 @@
 package com.codewithraj.shoppingcart.controller;
 
 import com.codewithraj.shoppingcart.model.Category;
-import com.codewithraj.shoppingcart.repository.CategoryRepository;
+import com.codewithraj.shoppingcart.service.CategoryService;
 import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +15,10 @@ import java.util.List;
 public class CategoryController {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     @GetMapping("/all")
     public List<Category> getCategories() {
-        return categoryRepository.getAllCategories();
+        return categoryService.getAllCategories();
     }
 }

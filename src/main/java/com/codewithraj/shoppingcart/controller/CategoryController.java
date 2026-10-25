@@ -3,6 +3,7 @@ package com.codewithraj.shoppingcart.controller;
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.response.ApiResponse;
 import com.codewithraj.shoppingcart.service.CategoryService;
+import com.codewithraj.shoppingcart.service.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final ICategoryService categoryService;
 
     @GetMapping
     public ResponseEntity<ApiResponse> getCategories() {
-        List<Category> categories = categoryService.getAllCategories();
+        List<Category> categories = categoryService.findAll();
         return ResponseEntity.ok(new ApiResponse("Found !",categories));
     }
 }

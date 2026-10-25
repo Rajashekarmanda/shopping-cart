@@ -54,22 +54,23 @@ public class CategoryController {
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse> updateCategory(@RequestBody Category category, @PathVariable Long id) {
-        Category newCategory = categoryService.updateCategory(category, id);
-        if (newCategory != null) {
-            return ResponseEntity.ok(new ApiResponse("Updated Category",newCategory));
+        Optional<Category> categoryToUpdate = categoryService.getCategoryById(id);
+        if (categoryToUpdate.isPresent()) {
+            Category categoryUpdated =  categoryService.updateCategory(category,id);
+            return ResponseEntity.ok(new ApiResponse("Updated Category",categoryUpdated));
         }else{
             return ResponseEntity.notFound().build();
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse> deleteCategory(@RequestBody Category category) {
-        Optional<Category> categoryToDelete = categoryService.getCategoryById(category.getId());
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Long id) {
+        Optional<Category> categoryToDelete = categoryService.getCategoryById(id);
         if (categoryToDelete.isPresent()) {
             categoryService.deleteCategory(categoryToDelete.get().getId());
-            return ResponseEntity.ok(new ApiResponse("Deleted Category",category));
+            return ResponseEntity.ok(new ApiResponse("Deleted Category",categoryToDelete));
         }else {
             return ResponseEntity.notFound().build();
         }

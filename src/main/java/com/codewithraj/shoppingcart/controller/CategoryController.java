@@ -49,7 +49,7 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addCategory(@RequestBody Category category) {
+    public ResponseEntity<ApiResponse> addCategory(@Valid @RequestBody Category category) {
         try {
             Category createdCategory =  categoryService.addCategory(category);
             return ResponseEntity.status(HttpStatus.CREATED)

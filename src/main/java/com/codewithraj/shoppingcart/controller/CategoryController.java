@@ -1,15 +1,17 @@
 package com.codewithraj.shoppingcart.controller;
 
 import com.codewithraj.shoppingcart.model.Category;
+import com.codewithraj.shoppingcart.response.AlreadyExistsException;
 import com.codewithraj.shoppingcart.response.ApiResponse;
 import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
 import com.codewithraj.shoppingcart.service.ICategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("${api.prefix}/categories")
@@ -27,10 +29,11 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getCategoryById(@PathVariable Long id) {
         try {
-            Optional<Category> category = categoryService.getCategoryById(id);
+            Category category = categoryService.getCategoryById(id);
             return ResponseEntity.ok(new ApiResponse("Found Category",category));
         }catch (ResourceNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
         }
     }
 
@@ -40,39 +43,45 @@ public class CategoryController {
             Category category = categoryService.getCategoryByName(name);
             return ResponseEntity.ok(new ApiResponse("Found Category",category));
         }catch (ResourceNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addCategory(@RequestBody Category category) {
-        Category newCategory = categoryService.addCategory(category);
-        if (newCategory != null) {
-            return ResponseEntity.ok(new ApiResponse("Added Category",newCategory));
-        }else  {
-            return ResponseEntity.notFound().build();
+        try {
+            Category createdCategory =  categoryService.addCategory(category);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse("Created Category",createdCategory));
+        }catch (AlreadyExistsException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                     .body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(@RequestBody Category category, @PathVariable Long id) {
-        Optional<Category> categoryToUpdate = categoryService.getCategoryById(id);
-        if (categoryToUpdate.isPresent()) {
-            Category categoryUpdated =  categoryService.updateCategory(category,id);
-            return ResponseEntity.ok(new ApiResponse("Updated Category",categoryUpdated));
-        }else{
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<ApiResponse> updateCategory(@Valid @RequestBody Category category, @PathVariable Long id) {
+        try {
+            Category updatedCategory =  categoryService.updateCategory(category, id);
+            return ResponseEntity.ok(new ApiResponse("Updated Category!",updatedCategory));
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }catch (AlreadyExistsException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Long id) {
-        Optional<Category> categoryToDelete = categoryService.getCategoryById(id);
-        if (categoryToDelete.isPresent()) {
-            categoryService.deleteCategory(categoryToDelete.get().getId());
-            return ResponseEntity.ok(new ApiResponse("Deleted Category",categoryToDelete));
-        }else {
-            return ResponseEntity.notFound().build();
+        try{
+            categoryService.deleteCategory(id);
+            return ResponseEntity.ok(new ApiResponse("deleted category!",null));
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
         }
     }
 }

@@ -2,11 +2,12 @@ package com.codewithraj.shoppingcart.service;
 
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.repository.CategoryRepository;
+import com.codewithraj.shoppingcart.response.AlreadyExistsException;
+import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,34 +21,47 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!"));
     }
 
     @Override
     public Category getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
+        return categoryRepository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!"));
+
     }
 
     @Override
     public Category addCategory(Category category) {
-        return categoryRepository.save(category);
+       if(categoryRepository.existsByName(category.getName())){
+           throw new AlreadyExistsException( category.getName() + "already exist");
+       }
+
+       // ignore if client sent any id
+        category.setId(null);
+       return categoryRepository.save(category);
     }
 
     @Override
     public Category updateCategory(Category category, Long id) {
-        Optional<Category> categoryOptional = categoryRepository.findById(id);
-        if (categoryOptional.isPresent()) {
-            Category categoryToUpdate = categoryOptional.get();
-            categoryToUpdate.setName(category.getName());
-            return categoryRepository.save(categoryToUpdate);
-        }else{
-            return null;
+        Category existingCategory = getCategoryById(id); // throws 404 case if missing
+        String newName = category.getName();
+
+        if(newName.equals(existingCategory.getName())){
+            throw new AlreadyExistsException(category.getName() + "already exist");
+        }else if(categoryRepository.existsById(id)){
+            category.setId(id);
+            return categoryRepository.save(category);
+        }else {
+            throw new ResourceNotFoundException("Category not found!");
         }
     }
 
     @Override
     public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
+        Category category = getCategoryById(id); // throws 404 case if missing
+        categoryRepository.delete(category);
     }
 }

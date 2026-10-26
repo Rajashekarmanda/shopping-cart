@@ -36,7 +36,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public Category addCategory(Category category) {
        if(categoryRepository.existsByName(category.getName())){
-           throw new AlreadyExistsException( category.getName() + "already exist");
+           throw new AlreadyExistsException( category.getName() + " already exist");
        }
 
        // ignore if client sent any id
@@ -46,7 +46,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public Category updateCategory(Category category, Long id) {
-        Category existingCategory = getCategoryById(id); // throws 404 case if missing
+        Category existingCategory = getCategoryById(id); // throws 404 case if missing because it's already method define above.
         String newName = category.getName();
 
         if(!newName.equals(existingCategory.getName()) && categoryRepository.existsByName(newName)){
@@ -58,7 +58,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public void deleteCategory(Long id) {
-        Category category = getCategoryById(id); // throws 404 case if missing
+        Category category = getCategoryById(id); // throws 404 case if missing because it's already method define above.
         categoryRepository.delete(category);
     }
 }

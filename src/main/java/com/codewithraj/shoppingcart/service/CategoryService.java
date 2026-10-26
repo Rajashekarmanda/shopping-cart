@@ -49,11 +49,8 @@ public class CategoryService implements ICategoryService {
         Category existingCategory = getCategoryById(id); // throws 404 case if missing
         String newName = category.getName();
 
-        if(newName == null || newName.isEmpty()){
-            throw new ResourceNotFoundException(category.getName() + "Name is mandatory to update!");
-        }
-        if(categoryRepository.existsByName(newName)){
-            throw new AlreadyExistsException(category.getName() + "is already exist");
+        if(!newName.equals(existingCategory.getName()) && categoryRepository.existsByName(newName)){
+            throw new AlreadyExistsException(category.getName() + " is already exist");
         }
         existingCategory.setName(newName);
         return categoryRepository.save(existingCategory);

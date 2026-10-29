@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
@@ -45,6 +46,9 @@ public class ProductController {
                     .body(new ApiResponse(e.getMessage(),null));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(e.getMessage(),null));
+        }catch (NoSuchElementException e){
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
         }
     }

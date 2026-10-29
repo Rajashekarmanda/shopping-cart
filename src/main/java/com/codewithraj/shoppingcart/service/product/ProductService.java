@@ -38,10 +38,10 @@ public class ProductService implements IProductService {
             throw new AlreadyExistsException("Product already exists!");
         }
         Category category = new Category();
-        Category reqCategory = categoryRepository.findByName(product.getCategory().getName()).get();
-        if (!categoryRepository.findByName(reqCategory.getName()).isPresent()) {
+        if (categoryRepository.findByName(product.getName()).isEmpty()) {
             throw new NoSuchElementException("Category not exists!");
         }
+        Category reqCategory = categoryRepository.findByName(product.getCategory().getName()).get();
         category.setName(reqCategory.getName());
         category.setId(reqCategory.getId());
 

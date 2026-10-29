@@ -1,4 +1,4 @@
-package com.codewithraj.shoppingcart.service;
+package com.codewithraj.shoppingcart.service.category;
 
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.repository.CategoryRepository;

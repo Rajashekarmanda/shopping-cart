@@ -4,7 +4,7 @@ import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.response.AlreadyExistsException;
 import com.codewithraj.shoppingcart.response.ApiResponse;
 import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
-import com.codewithraj.shoppingcart.service.ICategoryService;
+import com.codewithraj.shoppingcart.service.category.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

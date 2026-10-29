@@ -1,9 +1,8 @@
-package com.codewithraj.shoppingcart.service;
+package com.codewithraj.shoppingcart.service.category;
 
 import com.codewithraj.shoppingcart.model.Category;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ICategoryService {
     List<Category> getAllCategories();

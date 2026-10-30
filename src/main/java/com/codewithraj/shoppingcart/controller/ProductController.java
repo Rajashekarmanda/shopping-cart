@@ -5,6 +5,7 @@ import com.codewithraj.shoppingcart.response.AlreadyExistsException;
 import com.codewithraj.shoppingcart.response.ApiResponse;
 import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
 import com.codewithraj.shoppingcart.service.product.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,35 @@ public class ProductController {
                     .body(new ApiResponse(e.getMessage(),null));
         }catch (NoSuchElementException e){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(),null));
+        }
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
+        try {
+            Product savedProduct = productService.updateProduct(id, product);
+            return ResponseEntity.ok(new ApiResponse("Updated product", savedProduct));
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(),null));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(e.getMessage(),null));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(e.getMessage(),null));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {
+        try{
+            productService.deleteProduct(id);
+            return ResponseEntity.ok(new ApiResponse("Deleted product", null));
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
         }
     }

@@ -39,21 +39,48 @@ public class ProductService implements IProductService {
         }
 
         // search category weather it's exist or not ?
-        boolean foundCategory = categoryRepository.findByName(product.getCategory().getName()).isPresent();
-        if (!foundCategory) {
-            throw new NoSuchElementException("Category not exists!");
-        }
-
-        // create new category to store on product...
-        Category category = new Category();
-        Category reqCategory = categoryRepository.findByName(product.getCategory().getName()).get();
-        category.setName(reqCategory.getName());
-        category.setId(reqCategory.getId());
+        Category foundCategory = categoryRepository.findByName(product.getCategory().getName())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!"));
 
         // set category on product req...
-        product.setCategory(category);
+        product.setCategory(foundCategory);
 
         // save product finally...
         return productRepository.save(product);
+    }
+
+    @Override
+    public Product updateProduct(Long id, Product product) {
+        if (!productRepository.findById(product.getId()).isPresent()) {
+            throw new ResourceNotFoundException("Product not found!");
+        }
+
+        // checking category is exist or not
+        Category categoryFound = categoryRepository.findByName(product.getCategory().getName())
+                .orElseThrow(() -> new ResourceNotFoundException(product.getCategory().getName() + " Category not found!"));
+
+        // check product is exist or not
+        Product foundProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found! with ID "+ id));
+
+        // update details with new data
+        foundProduct.setName(product.getName());
+        foundProduct.setInventory(product.getInventory());
+        foundProduct.setBrand(product.getBrand());
+        foundProduct.setDescription(product.getDescription());
+        foundProduct.setPrice(product.getPrice());
+        foundProduct.setCategory(categoryFound);
+
+        //save
+        return productRepository.save(foundProduct);
+
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+        if (!productRepository.findById(id).isPresent()) {
+            throw new ResourceNotFoundException("Product not found!");
+        }
+        productRepository.deleteById(id);
     }
 }

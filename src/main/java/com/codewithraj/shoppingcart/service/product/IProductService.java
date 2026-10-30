@@ -13,5 +13,7 @@ public interface IProductService {
 
     Product addProduct(Product product);
 
-//    Product updateProduct(Product product);
+    Product updateProduct(Long id, Product product);
+
+    void deleteProduct(Long id);
 }

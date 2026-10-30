@@ -65,7 +65,7 @@ public class CategoryService implements ICategoryService {
     public void deleteCategory(Long id) {
         Category category = getCategoryById(id); // throws 404 case if missing because it's already method define above.
 
-        if(productRepository.existByCategoryId(id)){
+        if(productRepository.existsByCategoryId(id)){
             throw  new ResourceInUseException("Cannot delete " + category.getName() + ": it still has products");
         }
 

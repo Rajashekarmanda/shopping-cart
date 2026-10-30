@@ -1,4 +1,4 @@
-package com.codewithraj.shoppingcart.response;
+package com.codewithraj.shoppingcart.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

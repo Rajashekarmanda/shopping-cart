@@ -1,9 +1,9 @@
 package com.codewithraj.shoppingcart.service.product;
 
+import com.codewithraj.shoppingcart.dto.ProductDTO;
 import com.codewithraj.shoppingcart.model.Product;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IProductService {
 
@@ -18,4 +18,8 @@ public interface IProductService {
     void deleteProduct(Long id);
 
     long countProductsByBrandAndName(String brand, String name);
+
+    ProductDTO convertToDTO(Product product);
+
+    List<ProductDTO> convertToDTOList(List<Product> products);
 }

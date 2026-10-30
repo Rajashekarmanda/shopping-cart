@@ -1,17 +1,18 @@
 package com.codewithraj.shoppingcart.service.product;
 
+import com.codewithraj.shoppingcart.dto.CategoryDTO;
+import com.codewithraj.shoppingcart.dto.ProductDTO;
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.model.Product;
 import com.codewithraj.shoppingcart.repository.CategoryRepository;
 import com.codewithraj.shoppingcart.repository.ProductRepository;
-import com.codewithraj.shoppingcart.response.AlreadyExistsException;
-import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
+import com.codewithraj.shoppingcart.exceptions.AlreadyExistsException;
+import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class ProductService implements IProductService {
 
     @Override
     public Product addProduct(Product product) {
-        if (productRepository.findByName(product.getName()).isPresent()) {
+        if (productRepository.existsByNameAndBrand(product.getName(), product.getBrand())) {
             throw new AlreadyExistsException("Product already exists!");
         }
 
@@ -51,17 +52,11 @@ public class ProductService implements IProductService {
 
     @Override
     public Product updateProduct(Long id, Product product) {
-        productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
-
+        Product foundProduct = getProductById(id);
 
         // checking category is existing or not
         Category categoryFound = categoryRepository.findByName(product.getCategory().getName())
                 .orElseThrow(() -> new ResourceNotFoundException(product.getCategory().getName() + " Category not found!"));
-
-        // check product is existing or not
-        Product foundProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found! with ID "+ id));
 
         // update details with new data
         foundProduct.setName(product.getName());
@@ -87,5 +82,26 @@ public class ProductService implements IProductService {
     @Override
     public long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndNameContainingIgnoreCase(brand, name);
+    }
+
+    //  It will convert normal product obj into productDTO
+    @Override
+    public ProductDTO convertToDTO(Product product) {
+        Category c = product.getCategory();
+        return new ProductDTO(
+                product.getId(),
+                product.getName(),
+                product.getInventory(),
+                product.getBrand(),
+                product.getDescription(),
+                product.getPrice(),
+                new CategoryDTO(c.getId(), c.getName())
+        );
+    }
+
+    //  It will convert normal list of product's obj into productDTO List
+    @Override
+    public List<ProductDTO> convertToDTOList(List<Product> products) {
+        return products.stream().map(this::convertToDTO).toList();
     }
 }

@@ -1,9 +1,10 @@
 package com.codewithraj.shoppingcart.controller;
 
+import com.codewithraj.shoppingcart.dto.ProductDTO;
 import com.codewithraj.shoppingcart.model.Product;
-import com.codewithraj.shoppingcart.response.AlreadyExistsException;
+import com.codewithraj.shoppingcart.exceptions.AlreadyExistsException;
 import com.codewithraj.shoppingcart.response.ApiResponse;
-import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
+import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
 import com.codewithraj.shoppingcart.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
@@ -26,14 +26,16 @@ public class ProductController {
                                                         @RequestParam (required = false) String brand,
                                                         @RequestParam (required = false) String category) {
         List<Product> products = productService.getProducts(name, brand, category);
-        return ResponseEntity.ok(new ApiResponse("Found " + products.size() + " products",products));
+        List<ProductDTO> dtos = productService.convertToDTOList(products);
+        return ResponseEntity.ok(new ApiResponse("Found " + products.size() + " products",dtos));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long id) {
         try{
             Product product = productService.getProductById(id);
-            return ResponseEntity.ok(new ApiResponse("Found product", product));
+            ProductDTO productDTO = productService.convertToDTO(product);
+            return ResponseEntity.ok(new ApiResponse("Found product", productDTO));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
@@ -41,19 +43,17 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> addProduct(@RequestBody Product product) {
+    public ResponseEntity<ApiResponse> addProduct(@Valid @RequestBody Product product) {
         try {
             Product savedProduct = productService.addProduct(product);
+            ProductDTO savedProductDTO = productService.convertToDTO(savedProduct);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("Added product", savedProduct));
+                    .body(new ApiResponse("Added product", savedProductDTO));
         }catch (AlreadyExistsException e){
-            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED)
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(e.getMessage(),null));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(e.getMessage(),null));
-        }catch (NoSuchElementException e){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
         }
     }
@@ -63,12 +63,10 @@ public class ProductController {
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
         try {
             Product savedProduct = productService.updateProduct(id, product);
-            return ResponseEntity.ok(new ApiResponse("Updated product", savedProduct));
+            ProductDTO savedProductDTO = productService.convertToDTO(savedProduct);
+            return ResponseEntity.ok(new ApiResponse("Updated product", savedProductDTO));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(e.getMessage(),null));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(e.getMessage(),null));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

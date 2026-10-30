@@ -1,9 +1,12 @@
 package com.codewithraj.shoppingcart.service.category;
 
+import com.codewithraj.shoppingcart.exceptions.ResourceInUseException;
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.repository.CategoryRepository;
-import com.codewithraj.shoppingcart.response.AlreadyExistsException;
-import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
+import com.codewithraj.shoppingcart.exceptions.AlreadyExistsException;
+import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
+import com.codewithraj.shoppingcart.repository.ProductRepository;
+import com.codewithraj.shoppingcart.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,8 @@ import java.util.List;
 public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    private final ProductRepository productRepository;
 
     @Override
     public List<Category> getAllCategories() {
@@ -59,6 +64,11 @@ public class CategoryService implements ICategoryService {
     @Override
     public void deleteCategory(Long id) {
         Category category = getCategoryById(id); // throws 404 case if missing because it's already method define above.
+
+        if(productRepository.existByCategoryId(id)){
+            throw  new ResourceInUseException("Cannot delete " + category.getName() + ": it still has products");
+        }
+
         categoryRepository.delete(category);
     }
 }

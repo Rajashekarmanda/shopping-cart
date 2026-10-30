@@ -1,9 +1,10 @@
 package com.codewithraj.shoppingcart.controller;
 
+import com.codewithraj.shoppingcart.exceptions.ResourceInUseException;
 import com.codewithraj.shoppingcart.model.Category;
-import com.codewithraj.shoppingcart.response.AlreadyExistsException;
+import com.codewithraj.shoppingcart.exceptions.AlreadyExistsException;
 import com.codewithraj.shoppingcart.response.ApiResponse;
-import com.codewithraj.shoppingcart.response.ResourceNotFoundException;
+import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
 import com.codewithraj.shoppingcart.service.category.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,9 @@ public class CategoryController {
             return ResponseEntity.ok(new ApiResponse("deleted category!",null));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }catch (ResourceInUseException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(e.getMessage(), null));
         }
     }

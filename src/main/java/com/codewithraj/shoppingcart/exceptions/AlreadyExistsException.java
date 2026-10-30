@@ -1,4 +1,4 @@
-package com.codewithraj.shoppingcart.response;
+package com.codewithraj.shoppingcart.exceptions;
 
 public class AlreadyExistsException extends RuntimeException {
     public AlreadyExistsException(String message) {

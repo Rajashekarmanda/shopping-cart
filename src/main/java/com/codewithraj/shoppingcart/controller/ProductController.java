@@ -22,8 +22,11 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<ApiResponse> getAllProducts(@RequestParam (required = false) String name,
+                                                        @RequestParam (required = false) String brand,
+                                                        @RequestParam (required = false) String category) {
+        List<Product> products = productService.getProducts(name, brand, category);
+        return ResponseEntity.ok(new ApiResponse("Found " + products.size() + " products",products));
     }
 
     @GetMapping("/{id}")
@@ -41,7 +44,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> addProduct(@RequestBody Product product) {
         try {
             Product savedProduct = productService.addProduct(product);
-            return ResponseEntity.ok(new ApiResponse("Added product", savedProduct));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse("Added product", savedProduct));
         }catch (AlreadyExistsException e){
             return ResponseEntity.status(HttpStatus.ALREADY_REPORTED)
                     .body(new ApiResponse(e.getMessage(),null));
@@ -81,6 +85,12 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
         }
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<ApiResponse> getProductCount(@RequestParam String brand, @RequestParam String name) {
+        long count = productService.countProductsByBrandAndName(brand, name);
+        return ResponseEntity.ok(new ApiResponse("Products found !", count));
     }
 
 }

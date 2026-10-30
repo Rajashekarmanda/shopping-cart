@@ -22,8 +22,8 @@ public class ProductService implements IProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<Product> getProducts(String name, String brand, String category) {
+        return productRepository.findByFilters(name, brand, category);
     }
 
     @Override
@@ -51,15 +51,15 @@ public class ProductService implements IProductService {
 
     @Override
     public Product updateProduct(Long id, Product product) {
-        if (!productRepository.findById(product.getId()).isPresent()) {
-            throw new ResourceNotFoundException("Product not found!");
-        }
+        productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
 
-        // checking category is exist or not
+
+        // checking category is existing or not
         Category categoryFound = categoryRepository.findByName(product.getCategory().getName())
                 .orElseThrow(() -> new ResourceNotFoundException(product.getCategory().getName() + " Category not found!"));
 
-        // check product is exist or not
+        // check product is existing or not
         Product foundProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found! with ID "+ id));
 
@@ -82,5 +82,10 @@ public class ProductService implements IProductService {
             throw new ResourceNotFoundException("Product not found!");
         }
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public long countProductsByBrandAndName(String brand, String name) {
+        return productRepository.countByBrandAndNameContainingIgnoreCase(brand, name);
     }
 }

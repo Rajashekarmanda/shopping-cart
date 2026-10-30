@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface IProductService {
 
-    List<Product> getAllProducts();
+    List<Product> getProducts(String name, String brand, String category);
 
     Product getProductById(Long id);
 
@@ -16,4 +16,6 @@ public interface IProductService {
     Product updateProduct(Long id, Product product);
 
     void deleteProduct(Long id);
+
+    long countProductsByBrandAndName(String brand, String name);
 }

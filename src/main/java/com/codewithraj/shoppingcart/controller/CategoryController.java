@@ -55,7 +55,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse("Created Category",createdCategory));
         }catch (AlreadyExistsException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED)
                      .body(new ApiResponse(e.getMessage(), null));
         }
     }

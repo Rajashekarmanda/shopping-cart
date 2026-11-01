@@ -8,6 +8,8 @@ import com.codewithraj.shoppingcart.repository.CategoryRepository;
 import com.codewithraj.shoppingcart.repository.ProductRepository;
 import com.codewithraj.shoppingcart.exceptions.AlreadyExistsException;
 import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
+import com.codewithraj.shoppingcart.request.AddProductRequest;
+import com.codewithraj.shoppingcart.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(AddProductRequest product) {
         if (productRepository.existsByNameAndBrand(product.getName(), product.getBrand())) {
             throw new AlreadyExistsException("Product already exists!");
         }
@@ -43,15 +45,22 @@ public class ProductService implements IProductService {
         Category foundCategory = categoryRepository.findByName(product.getCategory().getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found!"));
 
-        // set category on product req...
-        product.setCategory(foundCategory);
+        Product newProduct = new Product();
+        newProduct.setName(product.getName());
+        newProduct.setBrand(product.getBrand());
+        newProduct.setCategory(foundCategory);
+        newProduct.setPrice(product.getPrice());
+        newProduct.setDescription(product.getDescription());
+        newProduct.setPrice(product.getPrice());
+        newProduct.setCategory(foundCategory);
+
 
         // save product finally...
-        return productRepository.save(product);
+        return productRepository.save(newProduct);
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(Long id, UpdateProductRequest product) {
         Product foundProduct = getProductById(id);
 
         // checking category is existing or not

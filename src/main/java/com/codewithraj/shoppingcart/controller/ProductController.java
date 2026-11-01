@@ -3,9 +3,11 @@ package com.codewithraj.shoppingcart.controller;
 import com.codewithraj.shoppingcart.dto.ProductDTO;
 import com.codewithraj.shoppingcart.model.Product;
 import com.codewithraj.shoppingcart.exceptions.AlreadyExistsException;
+import com.codewithraj.shoppingcart.request.AddProductRequest;
+import com.codewithraj.shoppingcart.request.UpdateProductRequest;
 import com.codewithraj.shoppingcart.response.ApiResponse;
 import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
-import com.codewithraj.shoppingcart.service.product.ProductService;
+import com.codewithraj.shoppingcart.service.product.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductService productService;
+    private final IProductService productService;
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts(@RequestParam (required = false) String name,
@@ -36,14 +38,14 @@ public class ProductController {
             Product product = productService.getProductById(id);
             ProductDTO productDTO = productService.convertToDTO(product);
             return ResponseEntity.ok(new ApiResponse("Found product", productDTO));
-        }catch (Exception e){
+        }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
         }
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> addProduct(@Valid @RequestBody Product product) {
+    public ResponseEntity<ApiResponse> addProduct(@Valid @RequestBody AddProductRequest product) {
         try {
             Product savedProduct = productService.addProduct(product);
             ProductDTO savedProductDTO = productService.convertToDTO(savedProduct);
@@ -53,23 +55,20 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(e.getMessage(),null));
         }catch (ResourceNotFoundException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(),null));
         }
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
+    public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest product) {
         try {
             Product savedProduct = productService.updateProduct(id, product);
             ProductDTO savedProductDTO = productService.convertToDTO(savedProduct);
             return ResponseEntity.ok(new ApiResponse("Updated product", savedProductDTO));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(e.getMessage(),null));
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(e.getMessage(),null));
         }
     }

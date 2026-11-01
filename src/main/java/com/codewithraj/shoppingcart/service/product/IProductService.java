@@ -2,6 +2,8 @@ package com.codewithraj.shoppingcart.service.product;
 
 import com.codewithraj.shoppingcart.dto.ProductDTO;
 import com.codewithraj.shoppingcart.model.Product;
+import com.codewithraj.shoppingcart.request.AddProductRequest;
+import com.codewithraj.shoppingcart.request.UpdateProductRequest;
 
 import java.util.List;
 
@@ -11,9 +13,9 @@ public interface IProductService {
 
     Product getProductById(Long id);
 
-    Product addProduct(Product product);
+    Product addProduct(AddProductRequest product);
 
-    Product updateProduct(Long id, Product product);
+    Product updateProduct(Long id, UpdateProductRequest product);
 
     void deleteProduct(Long id);
 

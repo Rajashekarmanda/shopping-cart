@@ -19,7 +19,7 @@ public class Image {
     private String fileType;
 
     @Lob
-    @Column(columnDefinition = "LONGLOB")
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] data;
 
     private String downloadUrl;

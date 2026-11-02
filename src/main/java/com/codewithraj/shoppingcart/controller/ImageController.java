@@ -7,6 +7,8 @@ import com.codewithraj.shoppingcart.model.Image;
 import com.codewithraj.shoppingcart.response.ApiResponse;
 import com.codewithraj.shoppingcart.service.image.IImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,22 @@ public class ImageController {
                     .body(new ApiResponse(e.getMessage(), null));
         }catch (InvalidFileException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/images/{id}")
+    public ResponseEntity<?> getImage(@PathVariable Long id){
+        try{
+            Image image = imageService.getImageById(id);
+            ByteArrayResource resource = new ByteArrayResource(image.getData());
+            ImageDTO dto = imageService.convertToDTO(image);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(image.getFileType()))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getFileName() + "\"")
+                    .body(resource);
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(), null));
         }
     }

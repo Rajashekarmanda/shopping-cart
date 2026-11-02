@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface IImageService {
 
+    Image getImageById(Long id);
+
     List<Image> saveImages(Long productId, List<MultipartFile> files);
 
     ImageDTO convertToDTO(Image image);

@@ -2,6 +2,7 @@ package com.codewithraj.shoppingcart.service.image;
 
 import com.codewithraj.shoppingcart.dto.ImageDTO;
 import com.codewithraj.shoppingcart.exceptions.InvalidFileException;
+import com.codewithraj.shoppingcart.exceptions.ResourceNotFoundException;
 import com.codewithraj.shoppingcart.model.Image;
 import com.codewithraj.shoppingcart.model.Product;
 import com.codewithraj.shoppingcart.repository.ImageRepository;
@@ -25,6 +26,12 @@ public class ImageService implements IImageService {
 
     @Value("${api.prefix}")
     private String apiPrefix;
+
+    @Override
+    public Image getImageById(Long id){
+        return  imageRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found"));
+    }
 
     @Override
     @Transactional

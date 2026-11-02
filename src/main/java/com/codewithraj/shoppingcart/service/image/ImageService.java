@@ -34,6 +34,26 @@ public class ImageService implements IImageService {
     }
 
     @Override
+    public Image updateImage(Long id, MultipartFile file) {
+        Image image = getImageById(id);  // 404 if missing
+        validateFile(file);             // 400 case if empty or not an image
+
+        image.setFileName(file.getOriginalFilename());
+        image.setFileType(file.getContentType());
+        image.setData(readBytes(file));
+
+        return imageRepository.save(image);
+    }
+
+    @Override
+    @Transactional
+    public void deleteImageById(Long id){
+        Image image = getImageById(id); // 404 if missing
+        image.getProduct().getImages().remove(image);
+        imageRepository.delete(image);
+    }
+
+    @Override
     @Transactional
     public List<Image> saveImages(Long productId, List<MultipartFile> files){
         Product product = productService.getProductById(productId); // 404 case if missing

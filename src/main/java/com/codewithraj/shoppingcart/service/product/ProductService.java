@@ -1,6 +1,7 @@
 package com.codewithraj.shoppingcart.service.product;
 
 import com.codewithraj.shoppingcart.dto.CategoryDTO;
+import com.codewithraj.shoppingcart.dto.ImageDTO;
 import com.codewithraj.shoppingcart.dto.ProductDTO;
 import com.codewithraj.shoppingcart.model.Category;
 import com.codewithraj.shoppingcart.model.Product;
@@ -95,6 +96,10 @@ public class ProductService implements IProductService {
     @Override
     public ProductDTO convertToDTO(Product product) {
         Category c = product.getCategory();
+        List<ImageDTO> images = product.getImages().stream()
+                .map(img -> new ImageDTO(img.getId(), img.getFileName(), img.getDownloadUrl()))
+                .toList();
+
         return new ProductDTO(
                 product.getId(),
                 product.getName(),
@@ -102,7 +107,8 @@ public class ProductService implements IProductService {
                 product.getBrand(),
                 product.getDescription(),
                 product.getPrice(),
-                new CategoryDTO(c.getId(), c.getName())
+                new CategoryDTO(c.getId(), c.getName()),
+                images
         );
     }
 

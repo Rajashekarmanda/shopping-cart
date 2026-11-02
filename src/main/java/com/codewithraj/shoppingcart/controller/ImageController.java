@@ -45,11 +45,35 @@ public class ImageController {
         try{
             Image image = imageService.getImageById(id);
             ByteArrayResource resource = new ByteArrayResource(image.getData());
-            ImageDTO dto = imageService.convertToDTO(image);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(image.getFileType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getFileName() + "\"")
                     .body(resource);
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @PutMapping(value = "/images/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse> updateImage(@PathVariable Long id, @RequestParam("files") MultipartFile file){
+        try {
+            Image updated = imageService.updateImage(id, file);
+            return ResponseEntity.ok(new ApiResponse("Image updated", imageService.convertToDTO(updated)));
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }catch (InvalidFileException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @DeleteMapping("/images/{id}")
+    public ResponseEntity<ApiResponse> deleteImage(@PathVariable Long id){
+        try{
+            imageService.deleteImageById(id);
+            return ResponseEntity.ok(new ApiResponse("Image deleted", null));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(), null));

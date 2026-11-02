@@ -10,6 +10,10 @@ public interface IImageService {
 
     Image getImageById(Long id);
 
+    Image updateImage(Long id, MultipartFile file);
+
+    void deleteImageById(Long id);
+
     List<Image> saveImages(Long productId, List<MultipartFile> files);
 
     ImageDTO convertToDTO(Image image);

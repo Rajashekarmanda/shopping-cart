@@ -22,7 +22,7 @@ public class ImageController {
 
     private final IImageService imageService;
 
-    @PostMapping(value = "/products/{productId/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/products/{productId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> uploadImage(@PathVariable Long productId, @RequestParam("files") List<MultipartFile> files) {
         try{
             List<Image> savedImages = imageService.saveImages(productId, files);

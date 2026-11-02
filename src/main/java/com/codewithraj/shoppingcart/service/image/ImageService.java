@@ -6,11 +6,11 @@ import com.codewithraj.shoppingcart.model.Image;
 import com.codewithraj.shoppingcart.model.Product;
 import com.codewithraj.shoppingcart.repository.ImageRepository;
 import com.codewithraj.shoppingcart.service.product.IProductService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +43,8 @@ public class ImageService implements IImageService {
             image.setProduct(product);
 
             Image saved = imageRepository.save(image);   // now it has an id
-            saved.setDownloadUrl(apiPrefix +"/images/"+saved.getId()); // build the URL with it
+            saved.setDownloadUrl(apiPrefix + "/images/" + saved.getId()); // build the URL with it
+            savedImages.add(imageRepository.save(saved));
         }
 
         return savedImages;

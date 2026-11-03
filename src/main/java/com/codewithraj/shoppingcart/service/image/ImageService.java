@@ -34,6 +34,7 @@ public class ImageService implements IImageService {
     }
 
     @Override
+    @Transactional
     public Image updateImage(Long id, MultipartFile file) {
         Image image = getImageById(id);  // 404 if missing
         validateFile(file);             // 400 case if empty or not an image

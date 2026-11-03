@@ -1,8 +1,8 @@
 package com.codewithraj.shoppingcart.repository;
 
-import com.codewithraj.shoppingcart.dto.CartItemDTO;
+import com.codewithraj.shoppingcart.model.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CartItemRepository extends JpaRepository<CartItemDTO, Long> {
+public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     boolean existsByProductId(Long productId);
 }

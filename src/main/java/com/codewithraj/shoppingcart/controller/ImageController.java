@@ -56,9 +56,9 @@ public class ImageController {
     }
 
     @PutMapping(value = "/images/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse> updateImage(@PathVariable Long id, @RequestParam("files") MultipartFile file){
+    public ResponseEntity<ApiResponse> updateImage(@PathVariable Long id, @RequestParam("files") MultipartFile files){
         try {
-            Image updated = imageService.updateImage(id, file);
+            Image updated = imageService.updateImage(id, files);
             return ResponseEntity.ok(new ApiResponse("Image updated", imageService.convertToDTO(updated)));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

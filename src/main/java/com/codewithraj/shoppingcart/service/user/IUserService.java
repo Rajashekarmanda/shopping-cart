@@ -2,17 +2,18 @@ package com.codewithraj.shoppingcart.service.user;
 
 import com.codewithraj.shoppingcart.dto.UserDTO;
 import com.codewithraj.shoppingcart.model.User;
+import com.codewithraj.shoppingcart.request.CreateUserRequest;
+import com.codewithraj.shoppingcart.request.UpdateUserRequest;
 
 public interface IUserService {
 
-    public User addUser(User user);
+    User createUser(CreateUserRequest request);
 
-    public User updateUser(User user);
+    User getUserById(Long id);
 
-    public User getUser(Long id);
+    User updateUser(Long id, UpdateUserRequest request);
 
-    public void deleteUser(Long id);
+    void deleteUserById(Long id);
 
-    public UserDTO convertToDTO(User user);
-
+    UserDTO convertToDTO(User user);
 }
